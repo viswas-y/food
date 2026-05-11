@@ -1,0 +1,27 @@
+<h2>Student Suggestions</h2>
+
+<table border="1">
+
+<tr>
+<th>Name</th>
+<th>Department</th>
+<th>Meal</th>
+<th>Preferred Item</th>
+<th>Description</th>
+<th>Date</th>
+</tr>
+
+{% for i in data %}
+
+<tr>
+<td>{{i.name}}</td>
+<td>{{i.department}}</td>
+<td>{{i.meal_type}}</td>
+<td>{{i.preferred_item}}</td>
+<td>{{i.description}}</td>
+<td>{{i.date}}</td>
+</tr>
+
+{% endfor %}
+
+</table>

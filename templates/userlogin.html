@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MessMate — Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green-deep: #1a2b1e;
+            --green-mid: #243328;
+            --green-light: #2f4234;
+            --gold: #c9a84c;
+            --gold-light: #e2c47a;
+            --gold-dim: rgba(201, 168, 76, 0.15);
+            --cream: #f5f0e8;
+            --white: #ffffff;
+            --text-muted: rgba(245, 240, 232, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--green-deep);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── TOP ANNOUNCEMENT BAR ── */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--green-deep);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 32px;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+        .topbar .badge {
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+        }
+
+        /* ── LEFT PANEL ── */
+        .left {
+            width: 52%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 60px 64px;
+        }
+
+        /* Dark food background simulation */
+        .left-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(160deg, rgba(26,43,30,0.55) 0%, rgba(26,43,30,0.88) 60%, rgba(26,43,30,0.97) 100%),
+                url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&auto=format&fit=crop&q=80') center/cover no-repeat;
+            z-index: 0;
+        }
+
+        /* Grain overlay */
+        .left-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.35;
+        }
+
+        .left-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand {
+            position: absolute;
+            top: 52px;
+            left: 64px;
+            z-index: 1;
+        }
+
+        .brand-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--cream);
+            letter-spacing: -0.01em;
+        }
+
+        .brand-logo span {
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .eyebrow-line {
+            width: 36px;
+            height: 1px;
+            background: var(--gold);
+        }
+
+        .eyebrow-text {
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            color: var(--gold);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .hero-headline {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(44px, 5.5vw, 72px);
+            line-height: 1.05;
+            color: var(--cream);
+            font-weight: 400;
+            margin-bottom: 22px;
+        }
+
+        .hero-headline em {
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        .hero-sub {
+            font-size: 13px;
+            line-height: 1.75;
+            color: var(--text-muted);
+            max-width: 380px;
+            font-weight: 300;
+            margin-bottom: 40px;
+        }
+
+        /* Schedule card */
+        .schedule-card {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(201,168,76,0.18);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px 28px;
+        }
+
+        .schedule-label {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .schedule-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--cream);
+            font-weight: 300;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot.breakfast { background: var(--gold); }
+        .dot.lunch     { background: #6abf7b; }
+        .dot.dinner    { background: rgba(245,240,232,0.3); }
+
+        .schedule-row .time {
+            margin-left: auto;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* ── RIGHT PANEL ── */
+        .right {
+            width: 48%;
+            background: var(--cream);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 60px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle texture on right */
+        .right::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.07) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 360px;
+            position: relative;
+            z-index: 1;
+            animation: fadeUp 0.7s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .login-eyebrow-line {
+            width: 28px;
+            height: 1px;
+            background: var(--gold);
+        }
+
+        .login-eyebrow-text {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .login-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 46px;
+            font-weight: 600;
+            color: var(--green-deep);
+            line-height: 1.05;
+            margin-bottom: 8px;
+        }
+
+        .login-title em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .login-sub {
+            font-size: 13px;
+            color: #6b7b6e;
+            margin-bottom: 36px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* Error messages */
+        .error-msg {
+            background: rgba(220,53,69,0.08);
+            border: 1px solid rgba(220,53,69,0.25);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #c0392b;
+            margin-bottom: 20px;
+        }
+
+        /* Field group */
+        .field {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .field label {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--green-mid);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 13px 16px;
+            background: transparent;
+            border: 1px solid rgba(47,66,52,0.2);
+            border-radius: 6px;
+            font-family: 'Jost', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--green-deep);
+            transition: border-color 0.25s, box-shadow 0.25s;
+            outline: none;
+        }
+
+        .field input::placeholder {
+            color: rgba(47,66,52,0.35);
+        }
+
+        .field input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+        }
+
+        .forgot {
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 28px;
+        }
+
+        .forgot a {
+            font-size: 12px;
+            color: #7a8c7d;
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+
+        .forgot a:hover {
+            color: var(--gold);
+        }
+
+        /* Login button */
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--green-deep);
+            color: var(--cream);
+            border: none;
+            border-radius: 6px;
+            font-family: 'Jost', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.25s, transform 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .btn-login:hover::after {
+            transform: translateX(100%);
+        }
+
+        .btn-login:hover {
+            background: var(--green-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 22px 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(47,66,52,0.12);
+        }
+
+        .divider-text {
+            font-size: 11px;
+            color: #9aab9d;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        /* Register link */
+        .register-link {
+            text-align: center;
+            font-size: 13px;
+            color: #6b7b6e;
+            font-weight: 300;
+        }
+
+        .register-link a {
+            color: var(--green-deep);
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 1px;
+            transition: color 0.2s;
+        }
+
+        .register-link a:hover {
+            color: var(--gold);
+        }
+
+        /* Bottom branding watermark */
+        .watermark {
+            position: absolute;
+            bottom: 28px;
+            right: 28px;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            color: rgba(47,66,52,0.25);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+    <span>🕐 Meals served 7:30 AM – 9:30 PM &nbsp;&nbsp; ✦ 100% Fresh Daily</span>
+    <span class="badge">✦ BOOKING OPEN</span>
+</div>
+
+<!-- LEFT PANEL -->
+<div class="left">
+    <div class="left-bg"></div>
+
+    <div class="brand">
+        <div class="brand-logo">Mess<span>Mate</span></div>
+    </div>
+
+    <div class="left-content">
+        <div class="eyebrow">
+            <div class="eyebrow-line"></div>
+            <span class="eyebrow-text">Smart Mess Booking</span>
+        </div>
+
+        <h1 class="hero-headline">
+            Every meal,<br>a <em>moment</em><br>to savour.
+        </h1>
+
+        <p class="hero-sub">
+            Browse daily menus, pre-book your meals, and track orders in real time — all in one elegant platform built for hostel life.
+        </p>
+
+        <div class="schedule-card">
+            <div class="schedule-label">Today's Schedule</div>
+            <div class="schedule-row">
+                <div class="dot breakfast"></div>
+                Breakfast
+                <span class="time">7:30 AM</span>
+            </div>
+            <div class="schedule-row">
+                <div class="dot lunch"></div>
+                Lunch
+                <span class="time">12:30 PM</span>
+            </div>
+            <div class="schedule-row">
+                <div class="dot dinner"></div>
+                Dinner
+                <span class="time">7:30 PM</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right">
+    <div class="login-box">
+        <div class="login-eyebrow">
+            <div class="login-eyebrow-line"></div>
+            <span class="login-eyebrow-text">Welcome back</span>
+        </div>
+
+        <h2 class="login-title">Sign <em>in</em></h2>
+        <p class="login-sub">Access your bookings, menus & more.</p>
+
+        <!-- Django error messages -->
+        {% for message in messages %}
+            <div class="error-msg">{{ message }}</div>
+        {% endfor %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="field">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <div class="forgot">
+                <a href="#">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-login">Login to MessMate</button>
+        </form>
+
+        <div class="divider">
+            <div class="divider-line"></div>
+            <span class="divider-text">or</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <div class="register-link">
+            New here? <a href="{% url 'userregister' %}">Create an account</a>
+        </div>
+    </div>
+
+    <div class="watermark">MessMate © 2026</div>
+</div>
+
+</body>
+</html>

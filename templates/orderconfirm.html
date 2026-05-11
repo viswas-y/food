@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MessMate — Confirm Order</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green-deep:  #1a2b1e;
+            --green-mid:   #243328;
+            --green-light: #2f4234;
+            --gold:        #c9a84c;
+            --gold-light:  #e2c47a;
+            --gold-dim:    rgba(201,168,76,0.12);
+            --cream:       #f5f0e8;
+            --text-muted:  rgba(245,240,232,0.45);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── TOP NAV ── */
+        .topbar-announce {
+            background: var(--green-deep);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 7px 36px; font-size: 11px;
+            letter-spacing: 0.08em; color: var(--text-muted);
+        }
+        .topbar-announce .badge { color: var(--gold); font-weight: 600; letter-spacing: 0.12em; }
+
+        .navbar {
+            background: var(--green-deep);
+            border-bottom: 1px solid rgba(201,168,76,0.15);
+            padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 62px;
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        .brand-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px; font-weight: 600;
+            color: var(--cream); letter-spacing: -0.01em;
+            text-decoration: none;
+        }
+        .brand-logo span { color: var(--gold); font-style: italic; }
+
+        .nav-links { display: flex; align-items: center; gap: 6px; }
+
+        .nav-links a {
+            display: flex; align-items: center; gap: 7px;
+            padding: 7px 14px;
+            color: rgba(245,240,232,0.6);
+            text-decoration: none; font-size: 13px; font-weight: 400;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { color: var(--cream); background: rgba(201,168,76,0.08); }
+
+        .btn-logout {
+            padding: 7px 16px;
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 6px;
+            color: var(--gold-light) !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.05em;
+        }
+        .btn-logout:hover { background: rgba(201,168,76,0.1) !important; border-color: var(--gold) !important; }
+
+        /* ── PAGE LAYOUT ── */
+        .page-content {
+            flex: 1;
+            padding: 48px 24px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 28px;
+        }
+
+        /* ── ORDER SUMMARY CARD (left) ── */
+        .summary-card {
+            width: 300px;
+            flex-shrink: 0;
+            background: var(--green-deep);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(201,168,76,0.15);
+            box-shadow: 0 8px 36px rgba(26,43,30,0.2);
+            animation: fadeUp 0.5s ease both;
+            position: relative;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .summary-header {
+            padding: 28px 26px 22px;
+            border-bottom: 1px solid rgba(201,168,76,0.12);
+        }
+
+        .summary-eyebrow {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+        }
+        .eyebrow-line { width: 24px; height: 1px; background: var(--gold); }
+        .eyebrow-text {
+            font-size: 9px; letter-spacing: 0.2em;
+            color: var(--gold); text-transform: uppercase; font-weight: 500;
+        }
+
+        .summary-meal-type {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px; font-weight: 400;
+            color: var(--cream); line-height: 1.1;
+        }
+        .summary-meal-type em { font-style: italic; color: var(--gold); }
+
+        .meal-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            margin-top: 12px;
+            background: var(--gold-dim);
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 11px; color: var(--gold-light);
+            letter-spacing: 0.05em;
+        }
+
+        .summary-items {
+            padding: 22px 26px 26px;
+        }
+
+        .summary-items-label {
+            font-size: 9px; letter-spacing: 0.2em;
+            color: var(--text-muted); text-transform: uppercase; font-weight: 500;
+            margin-bottom: 14px;
+        }
+
+        .items-list {
+            display: flex; flex-direction: column; gap: 9px;
+        }
+
+        .item-row {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; color: rgba(245,240,232,0.75); font-weight: 300;
+        }
+
+        .item-dot {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--gold); flex-shrink: 0; opacity: 0.7;
+        }
+
+        .summary-divider {
+            border: none; border-top: 1px solid rgba(201,168,76,0.1); margin: 6px 0;
+        }
+
+        .summary-info-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 26px;
+            border-top: 1px solid rgba(201,168,76,0.1);
+            font-size: 11px;
+        }
+
+        .info-label { color: var(--text-muted); letter-spacing: 0.05em; }
+        .info-val { color: var(--gold-light); font-weight: 500; }
+
+        /* ── FORM CARD (right) ── */
+        .form-card {
+            width: 100%; max-width: 480px;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid rgba(201,168,76,0.1);
+            box-shadow: 0 6px 32px rgba(26,43,30,0.07);
+            overflow: hidden;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(22px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .form-card-header {
+            background: var(--green-deep);
+            padding: 26px 32px;
+            position: relative; overflow: hidden;
+        }
+
+        .form-card-header::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+        }
+
+        .form-card-header .deco {
+            position: absolute; right: -40px; top: -40px;
+            width: 130px; height: 130px; border-radius: 50%;
+            border: 1px solid rgba(201,168,76,0.08); pointer-events: none;
+        }
+
+        .form-card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px; font-weight: 400;
+            color: var(--cream); line-height: 1.1;
+            position: relative; z-index: 1;
+        }
+        .form-card-title em { font-style: italic; color: var(--gold); }
+
+        .form-card-sub {
+            font-size: 12px; color: var(--text-muted);
+            margin-top: 4px; font-weight: 300;
+            position: relative; z-index: 1;
+        }
+
+        .form-body { padding: 30px 32px 32px; }
+
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .field { margin-bottom: 20px; }
+
+        .field label {
+            display: block; font-size: 10px; letter-spacing: 0.15em;
+            text-transform: uppercase; color: var(--green-mid);
+            font-weight: 600; margin-bottom: 7px;
+        }
+
+        .field label .req { color: var(--gold); margin-left: 2px; }
+        .field label .opt {
+            font-size: 9px; color: #9aab9d; letter-spacing: 0.08em;
+            font-weight: 400; text-transform: none; margin-left: 4px;
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: transparent;
+            border: 1px solid rgba(47,66,52,0.2);
+            border-radius: 7px;
+            font-family: 'Jost', sans-serif;
+            font-size: 14px; font-weight: 300;
+            color: var(--green-deep);
+            transition: border-color 0.25s, box-shadow 0.25s;
+            outline: none;
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder { color: rgba(47,66,52,0.35); }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+        }
+
+        .field textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+        /* Note box */
+        .note-box {
+            display: flex; align-items: flex-start; gap: 10px;
+            background: var(--gold-dim);
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 22px;
+            font-size: 12px; color: #6b7b6e; font-weight: 300; line-height: 1.55;
+        }
+
+        .note-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+        /* Submit */
+        .btn-confirm {
+            width: 100%;
+            padding: 14px;
+            background: var(--green-deep);
+            color: var(--cream);
+            border: none; border-radius: 7px;
+            font-family: 'Jost', sans-serif;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.25s, transform 0.15s;
+            position: relative; overflow: hidden;
+        }
+
+        .btn-confirm::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .btn-confirm:hover::after { transform: translateX(100%); }
+        .btn-confirm:hover { background: var(--green-light); transform: translateY(-1px); }
+        .btn-confirm:active { transform: translateY(0); }
+
+        /* back link */
+        .back-link {
+            display: block; text-align: center; margin-top: 18px;
+            font-size: 12px; color: #9aab9d; text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--green-deep); }
+
+        @media (max-width: 860px) {
+            .page-content { flex-direction: column; align-items: center; }
+            .summary-card { width: 100%; max-width: 480px; }
+        }
+
+        @media (max-width: 520px) {
+            .navbar { padding: 0 20px; }
+            .page-content { padding: 28px 16px; }
+            .field-row { grid-template-columns: 1fr; }
+            .form-body { padding: 24px 20px 28px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar-announce">
+    <span>🕐 Meals served 7:30 AM – 9:30 PM &nbsp;&nbsp; ✦ 100% Fresh Daily</span>
+    <span class="badge">✦ BOOKING OPEN</span>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'home' %}" class="brand-logo">Mess<span>Mate</span></a>
+    <div class="nav-links">
+        <a href="{% url 'home' %}">🏠 Home</a>
+        <a href="{% url 'menu' %}">🍽️ Menu</a>
+        <a href="{% url 'mybookings' %}">📦 Bookings</a>
+        <a href="{% url 'userlogin' %}" class="btn-logout">Logout</a>
+    </div>
+</nav>
+
+<!-- Page content -->
+<div class="page-content">
+
+    <!-- LEFT — Order summary -->
+    <div class="summary-card">
+        <div class="summary-header">
+            <div class="summary-eyebrow">
+                <div class="eyebrow-line"></div>
+                <span class="eyebrow-text">Your Order</span>
+            </div>
+            <div class="summary-meal-type">
+                {{ menu.menu_type|title }}
+            </div>
+            <div class="meal-badge">🍽️ &nbsp; Today's Special</div>
+        </div>
+
+        <div class="summary-items">
+            <div class="summary-items-label">Included Items</div>
+            <div class="items-list">
+                {% for item in menu.items.split %}
+                    <div class="item-row">
+                        <div class="item-dot"></div>
+                        {{ item }}
+                    </div>
+                {% empty %}
+                    <div class="item-row">
+                        <div class="item-dot"></div>
+                        {{ menu.items }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="summary-info-row">
+            <span class="info-label">Date</span>
+            <span class="info-val">{{ menu.date }}</span>
+        </div>
+        <div class="summary-info-row">
+            <span class="info-label">Status</span>
+            <span class="info-val">✦ Booking Open</span>
+        </div>
+    </div>
+
+    <!-- RIGHT — Confirm form -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="deco"></div>
+            <div class="form-card-title">Confirm <em>Order</em></div>
+            <div class="form-card-sub">Fill in your details to reserve this meal.</div>
+        </div>
+
+        <div class="form-body">
+
+            <div class="note-box">
+                <span class="note-icon">✦</span>
+                Your meal will be prepared fresh and ready at the scheduled serving time. Please arrive on time.
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="name">Full Name <span class="req">*</span></label>
+                        <input type="text" id="name" name="name" placeholder="Your full name" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="room">Room Number <span class="req">*</span></label>
+                        <input type="text" id="room" name="room" placeholder="e.g. A-204" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="phone">Phone Number <span class="req">*</span></label>
+                    <input type="tel" id="phone" name="phone" placeholder="e.g. 9876543210" required>
+                </div>
+
+                <div class="field">
+                    <label for="description">
+                        Special Instructions
+                        <span class="opt">(optional)</span>
+                    </label>
+                    <textarea id="description" name="description"
+                        placeholder="Any dietary notes or preferences..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-confirm">Confirm & Book Meal</button>
+            </form>
+
+            <a href="{% url 'menu' %}" class="back-link">← Back to menu</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

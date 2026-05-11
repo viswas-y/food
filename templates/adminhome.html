@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MessMate — Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green-deep:  #1a2b1e;
+            --green-mid:   #243328;
+            --green-light: #2f4234;
+            --green-hover: #3a5040;
+            --gold:        #c9a84c;
+            --gold-light:  #e2c47a;
+            --gold-dim:    rgba(201,168,76,0.12);
+            --cream:       #f5f0e8;
+            --cream-dark:  #ede8df;
+            --text-muted:  rgba(245,240,232,0.45);
+            --sidebar-w:   260px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+        }
+
+        /* ══════════════════════════════
+           SIDEBAR
+        ══════════════════════════════ */
+        .sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            background: var(--green-deep);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 50;
+        }
+
+        /* subtle grain */
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* top gold accent line */
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .sidebar-brand {
+            padding: 32px 28px 28px;
+            border-bottom: 1px solid rgba(201,168,76,0.15);
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--cream);
+            letter-spacing: -0.01em;
+        }
+
+        .brand-logo span {
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        .brand-sub {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+            position: relative;
+            z-index: 1;
+            overflow-y: auto;
+        }
+
+        .nav-section-label {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 16px 28px 8px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 11px 28px;
+            color: rgba(245,240,232,0.65);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            transition: all 0.22s ease;
+            position: relative;
+        }
+
+        .sidebar-nav a .nav-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--cream);
+            background: rgba(201,168,76,0.08);
+            padding-left: 34px;
+        }
+
+        .sidebar-nav a.active {
+            color: var(--gold-light);
+            background: var(--gold-dim);
+        }
+
+        .sidebar-nav a.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--gold);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .sidebar-nav a.logout {
+            color: rgba(245,240,232,0.4);
+            margin-top: 8px;
+            border-top: 1px solid rgba(201,168,76,0.1);
+            padding-top: 18px;
+        }
+
+        .sidebar-nav a.logout:hover {
+            color: #e07575;
+            background: rgba(224,117,117,0.07);
+        }
+
+        .sidebar-bottom {
+            padding: 20px 28px;
+            border-top: 1px solid rgba(201,168,76,0.12);
+            position: relative;
+            z-index: 1;
+        }
+
+        .admin-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: var(--gold-dim);
+            border: 1px solid rgba(201,168,76,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .admin-info { line-height: 1.3; }
+
+        .admin-name {
+            font-size: 13px;
+            color: var(--cream);
+            font-weight: 500;
+        }
+
+        .admin-role {
+            font-size: 10px;
+            color: var(--gold);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* ══════════════════════════════
+           MAIN CONTENT
+        ══════════════════════════════ */
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top announcement bar */
+        .topbar-announce {
+            background: var(--green-deep);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 36px;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        .topbar-announce .badge {
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+        }
+
+        /* Page header */
+        .page-header {
+            background: var(--green-deep);
+            padding: 28px 40px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+        }
+
+        /* decorative circle */
+        .page-header .deco {
+            position: absolute;
+            right: -60px; top: -60px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            border: 1px solid rgba(201,168,76,0.08);
+            pointer-events: none;
+        }
+
+        .page-header .deco2 {
+            position: absolute;
+            right: 20px; top: -20px;
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            border: 1px solid rgba(201,168,76,0.06);
+            pointer-events: none;
+        }
+
+        .page-header-eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .eyebrow-line {
+            width: 28px; height: 1px;
+            background: var(--gold);
+        }
+
+        .eyebrow-text {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .page-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 38px;
+            font-weight: 400;
+            color: var(--cream);
+            line-height: 1.1;
+        }
+
+        .page-header h1 em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .page-header-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 300;
+            letter-spacing: 0.03em;
+        }
+
+        /* ── PAGE BODY ── */
+        .page-body {
+            padding: 36px 40px;
+            flex: 1;
+        }
+
+        /* Section label */
+        .section-eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .section-eyebrow-line {
+            width: 24px; height: 1px;
+            background: var(--gold);
+        }
+
+        .section-eyebrow-text {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        /* ── STAT CARDS ── */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 28px 28px 24px;
+            border: 1px solid rgba(201,168,76,0.1);
+            box-shadow: 0 4px 20px rgba(26,43,30,0.06);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.12s; }
+        .card:nth-child(3) { animation-delay: 0.19s; }
+        .card:nth-child(4) { animation-delay: 0.26s; }
+
+        @keyframes fadeUp {
+            from { opacity:0; transform: translateY(20px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 36px rgba(26,43,30,0.12);
+        }
+
+        /* top accent stripe */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        .card-icon {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            background: var(--gold-dim);
+            border: 1px solid rgba(201,168,76,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .card-label {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8a9e8d;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-weight: 600;
+            color: var(--green-deep);
+            line-height: 1;
+        }
+
+        .status-yes {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            font-weight: 600;
+            color: #4a9e65;
+            font-style: italic;
+        }
+
+        .status-no {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            font-weight: 600;
+            color: #c0392b;
+            font-style: italic;
+        }
+
+        .card-trend {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #9aab9d;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ── QUICK ACTIONS ── */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 16px 20px;
+            background: #ffffff;
+            border: 1px solid rgba(201,168,76,0.12);
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--green-mid);
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'Jost', sans-serif;
+            transition: all 0.22s ease;
+            cursor: pointer;
+        }
+
+        .action-btn .action-icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .action-btn:hover {
+            background: var(--green-deep);
+            color: var(--cream);
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(26,43,30,0.15);
+        }
+
+        .action-btn .arrow {
+            margin-left: auto;
+            font-size: 11px;
+            opacity: 0.4;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .action-btn:hover .arrow {
+            opacity: 1;
+            transform: translateX(3px);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 200px; }
+            .main { margin-left: 200px; }
+            .page-body { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-logo">Mess<span>Mate</span></div>
+        <div class="brand-sub">Admin Console</div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <a href="#" class="active">
+            <span class="nav-icon">🏠</span> Dashboard
+        </a>
+        <a href="{% url 'addmenu' %}">
+            <span class="nav-icon">🍽️</span> Add Menu
+        </a>
+        <a href="{% url 'viewbookings' %}">
+            <span class="nav-icon">📦</span> Bookings
+        </a>
+
+        <div class="nav-section-label">Manage</div>
+        <a href="{% url 'adminsuggestionview' %}">
+            <span class="nav-icon">💡</span> Suggestions
+        </a>
+        <a href="{% url 'admincomplaint' %}">
+            <span class="nav-icon">📩</span> Complaints
+        </a>
+        <a href="#">
+            <span class="nav-icon">🔔</span> Notifications
+        </a>
+
+        <a href="{% url 'userlogin' %}" class="logout">
+            <span class="nav-icon">🚪</span> Logout
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <div class="admin-chip">
+            <div class="admin-avatar">👨‍💼</div>
+            <div class="admin-info">
+                <div class="admin-name">Administrator</div>
+                <div class="admin-role">Super Admin</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+    <!-- Announce bar -->
+    <div class="topbar-announce">
+        <span>🕐 Meals served 7:30 AM – 9:30 PM &nbsp;&nbsp; ✦ 100% Fresh Daily</span>
+        <span class="badge">✦ BOOKING OPEN</span>
+    </div>
+
+    <!-- Page header -->
+    <div class="page-header">
+        <div class="deco"></div>
+        <div class="deco2"></div>
+
+        <div class="page-header-eyebrow">
+            <div class="eyebrow-line"></div>
+            <span class="eyebrow-text">Overview</span>
+        </div>
+
+        <h1>Good morning, <em>Admin.</em></h1>
+        <p class="page-header-meta">Here's what's happening at MessMate today.</p>
+    </div>
+
+    <!-- Page body -->
+    <div class="page-body">
+
+        <!-- Stats -->
+        <div class="section-eyebrow">
+            <div class="section-eyebrow-line"></div>
+            <span class="section-eyebrow-text">Today's Snapshot</span>
+        </div>
+
+        <div class="cards">
+
+            <div class="card">
+                <div class="card-icon">👥</div>
+                <div class="card-label">Total Users</div>
+                <div class="card-value">{{ total_users }}</div>
+                <div class="card-trend">↑ Registered students</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🍽️</div>
+                <div class="card-label">Today's Menu</div>
+                {% if today_menu %}
+                    <div class="status-yes">Available</div>
+                    <div class="card-trend">✦ Menu is live</div>
+                {% else %}
+                    <div class="status-no">Not Added</div>
+                    <div class="card-trend">⚠ Please add today's menu</div>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📦</div>
+                <div class="card-label">Today's Bookings</div>
+                <div class="card-value">{{ today_bookings }}</div>
+                <div class="card-trend">↑ Meals pre-booked</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⚠️</div>
+                <div class="card-label">Pending Complaints</div>
+                <div class="card-value">{{ pending_complaints }}</div>
+                <div class="card-trend">Awaiting resolution</div>
+            </div>
+
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-eyebrow">
+            <div class="section-eyebrow-line"></div>
+            <span class="section-eyebrow-text">Quick Actions</span>
+        </div>
+
+        <div class="actions-grid">
+            <a href="{% url 'addmenu' %}" class="action-btn">
+                <span class="action-icon">🍽️</span> Add Today's Menu
+                <span class="arrow">→</span>
+            </a>
+            <a href="{% url 'viewbookings' %}" class="action-btn">
+                <span class="action-icon">📦</span> View Bookings
+                <span class="arrow">→</span>
+            </a>
+            <a href="{% url 'admincomplaint' %}" class="action-btn">
+                <span class="action-icon">📩</span> Review Complaints
+                <span class="arrow">→</span>
+            </a>
+            <a href="{% url 'adminsuggestionview' %}" class="action-btn">
+                <span class="action-icon">💡</span> View Suggestions
+                <span class="arrow">→</span>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
